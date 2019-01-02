@@ -1,28 +1,43 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
+import { connect } from 'react-redux';
+import { fetchUser } from './actions/userActions';
+import { fetchTweets } from './actions/tweetsActions';
 import './App.css';
 
+
 class App extends Component {
+
+  fetchUser = (event) => {
+    this.props.fetchUser();
+  }
+
+  fetchTweets = (event) => {
+    this.props.fetchTweets();
+  }
+
   render() {
+    const props = this.props;
+    console.log("Props: ", props);
+    const name = props.user.user.name;
+    const numberOfTweets = props.tweets.tweets.length;
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <button onClick={this.fetchUser}>Get user</button>
+        {name && <h1>{name}</h1>}
+        <button onClick={this.fetchTweets}>Get number of tweets</button>
+        {numberOfTweets && <h1>{numberOfTweets}</h1>}
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = state => ({
+  ...state
+});
+
+const mapDispatchToProps = dispatch => ({
+  fetchUser: () => dispatch(fetchUser()),
+  fetchTweets: () => dispatch(fetchTweets())
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
