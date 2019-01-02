@@ -1,31 +1,55 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { fetchUser } from './actions/userActions';
-import { fetchTweets } from './actions/tweetsActions';
+import { fetchData, toggleDisplay } from './actions/insuranceActions';
+
+import InsuranceCard from './components/insuranceCard';
 import './App.css';
 
 
 class App extends Component {
 
-  fetchUser = (event) => {
-    this.props.fetchUser();
+  componentWillMount() {
+    this.fetchData();
   }
 
-  fetchTweets = (event) => {
-    this.props.fetchTweets();
+  fetchData = (event) => {
+    this.props.fetchData();
+  }
+
+  toggleDisplay() {
+    this.props.toggleDisplay();
   }
 
   render() {
     const props = this.props;
-    console.log("Props: ", props);
-    const name = props.user.user.name;
-    const numberOfTweets = props.tweets.tweets.length;
+    const insurances = props.insurances.insurances;
+    let cards;
+
+    if (insurances && props.limitedRange) {
+      cards = insurances.slice(0, 8);
+    } else if (insurances && !props.limitedRange) {
+      cards = insurances;
+    } else {
+      cards = [];
+    }
+
     return (
       <div className="App">
-        <button onClick={this.fetchUser}>Get user</button>
-        {name && <h1>{name}</h1>}
-        <button onClick={this.fetchTweets}>Get number of tweets</button>
-        {numberOfTweets && <h1>{numberOfTweets}</h1>}
+        <header className="header">
+          <span><b>Moderna</b></span>
+        </header>
+        <div className="wrapper">
+          <div className="cardsWrapper">
+            {cards && cards.map((card, i) => {
+              return (
+                <InsuranceCard data={card} key={i} />
+              )
+            })
+            }
+          </div>
+          <span onClick={this.props.toggleDisplay} className="toggleDisplay">{props.limitedRange ? 'Visa mer' : 'Visa färre'}</span>
+        </div>
+        <footer className="footer"></footer>
       </div>
     );
   }
@@ -36,8 +60,8 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  fetchUser: () => dispatch(fetchUser()),
-  fetchTweets: () => dispatch(fetchTweets())
+  fetchData: () => dispatch(fetchData()),
+  toggleDisplay: () => dispatch(toggleDisplay()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
